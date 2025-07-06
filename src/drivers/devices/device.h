@@ -51,6 +51,8 @@
 #include "waveshareS3Geek.h"
 #elif defined(NERDMINER_T_HMI)
 #include "lilygoT_HMI.h"
+#elif defined(LILYGO_T5_V231)
+#include "lilygoT5v231.h"
 
 
 #else

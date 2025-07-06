@@ -60,6 +60,9 @@ DisplayDriver *currentDisplayDriver = &m5stickCPlusDriver;
 DisplayDriver *currentDisplayDriver = &t_hmiDisplayDriver;
 #endif
 
+#ifdef LILYGO_T5_V231_DISPLAY
+DisplayDriver *currentDisplayDriver  = &lilygoT5v231DisplayDriver;
+#endif
 
 // Initialize the display
 void initDisplay()

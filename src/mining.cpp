@@ -255,6 +255,9 @@ void runMiner(void * task_id) {
     unsigned long nonce = TARGET_NONCE - MAX_NONCE;
     // split up odd/even nonces between miner tasks
     nonce += miner_id;
+    //Serial.println(">>> STARTING TO HASH NONCES ");
+    //Serial.println(nonce,HEX);
+    
     uint32_t startT = micros();
     unsigned char *header64;
     // each miner thread needs to track its own blockheader template
@@ -296,6 +299,9 @@ void runMiner(void * task_id) {
       //if(!is16BitShare){
         // increment nonce
         nonce += 2;
+        //Serial.println(">>> STARTING TO HASH NONCES ");
+        //Serial.println(nonce,HEX);
+        nonce = random(MAX_NONCE, TARGET_NONCE);
         continue;
       }
 
@@ -334,6 +340,9 @@ void runMiner(void * task_id) {
       if(hash[29] !=0 || hash[28] !=0) {
         // increment nonce
         nonce += 2;
+        //Serial.println(">>> STARTING TO HASH NONCES ");
+        //Serial.println(nonce,HEX);
+        nonce = random(MAX_NONCE, TARGET_NONCE);
         continue;
       }
       shares++;
@@ -341,6 +350,7 @@ void runMiner(void * task_id) {
       // check if valid header
       if(checkValid(hash, mMiner.bytearray_target)){
         Serial.printf("[WORKER] %d CONGRATULATIONS! Valid block found with nonce: %d | 0x%x\n", miner_id, nonce, nonce);
+        tx_mining_submit(client, mWorker, mJob, nonce);
         valids++;
         Serial.printf("[WORKER]  %d  Submitted work valid!\n", miner_id);
         // wait for new job
@@ -348,6 +358,9 @@ void runMiner(void * task_id) {
       }
       // increment nonce
       nonce += 2;
+      nonce = random(MAX_NONCE,TARGET_NONCE);
+      //Serial.println(">>> STARTING TO HASH NONCES ");
+      //Serial.println(nonce,HEX);
     } // exit if found a valid result or nonce > MAX_NONCE
 
     //wc_Sha256Free(&sha256);
@@ -355,7 +368,7 @@ void runMiner(void * task_id) {
 
     mMiner.inRun = false;
     Serial.print(">>> Finished job waiting new data from pool");
-
+    Serial.println(nonce,HEX);
     if(hashes>=MAX_NONCE_STEP) {
       Mhashes=Mhashes+MAX_NONCE_STEP/1000000;
       hashes=hashes-MAX_NONCE_STEP;

@@ -63,13 +63,16 @@ void lilygot5v231display_AlternateRotation(void)
 
 
 double cycleCounter = 0;
-
 unsigned long previousMillisDisplay = 0;
+
+
+mining_data previous_mining_data;
 
 void lilygot5v231display_MinerScreen(unsigned long mElapsed)
 {
   mining_data data = getMiningData(mElapsed);
 
+  /*
   // Print hashrate to serial
   Serial.printf(">>> Completed %s share(s), %s Khashes, avg. hashrate %s KH/s\n",
                 data.completedShares.c_str(), data.totalKHashes.c_str(), data.currentHashRate.c_str());
@@ -82,42 +85,102 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
   Serial.printf(">>> Temperature: %s\n", data.temp.c_str());
   Serial.printf(">>> Total MHashes: %s\n", data.totalMHashes.c_str());
   Serial.printf(">>> Time mining: %s\n", data.timeMining.c_str());
-  
+  */
   unsigned long currentMillis = millis();
 
   if (hasChangedScreen || previousMillisDisplay == 0 || currentMillis - previousMillisDisplay >= (1000*60))
     { // 0.5sec blink
-      hasChangedScreen = false;
-      previousMillisDisplay = currentMillis;
+      
       //digitalWrite(LED_PIN, !digitalRead(LED_PIN)); // Cambia el estado del LED
       //cleanDisplay();
       
-      display.fillScreen(GxEPD_WHITE);
+      int d = 8;
       
       display.setRotation(0);
-      display.setTextColor(GxEPD_BLACK);
-      display.setCursor(0, 10);
-      display.setFont(&FreeMonoBold9pt7b);
-      display.println("Valid Blx");
+      //display.fillScreen(GxEPD_WHITE);
+      int height = (12*2)+d;
+      if(hasChangedScreen||previous_mining_data.valids==NULL||previous_mining_data.valids!=data.valids){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,0,122,height,GxEPD_WHITE);
+        display.drawRect(0,0,122,height,GxEPD_BLACK);
+        display.setCursor(0, 12);
+        display.setTextColor(GxEPD_BLACK);
+        display.println("Valid Blx");
+        display.println(data.valids.c_str());
+      }
       
-      display.print(data.valids.c_str());
-      display.print("\n");
-      display.println("Blx Templ.");
-      display.println(data.templates.c_str());
-      display.println("Best Diff.");
-      display.println(data.bestDiff.c_str());
-      display.println("32Bit shar");
-      display.println(data.completedShares.c_str());
-      display.println("Temp.");
-      display.println(data.temp.c_str());
-      display.println("Tot. MH.");
-      display.println(data.totalMHashes.c_str());
-      display.println(data.timeMining.c_str());
+      if(hasChangedScreen||previous_mining_data.templates==NULL||previous_mining_data.templates!=data.templates){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height,122,height,GxEPD_WHITE);
+        display.drawRect(0,height,122,height,GxEPD_BLACK);
+        display.setCursor(0, height+12);
+        display.println("Blx Templ.");
+        display.println(data.templates.c_str());
+      }
+      if(hasChangedScreen||previous_mining_data.bestDiff==NULL||previous_mining_data.bestDiff!=data.bestDiff){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height*2,122,height,GxEPD_WHITE);
+        display.drawRect(0,height*2,122,height,GxEPD_BLACK);
+        display.setCursor(0, (height*2)+12);
+        display.println("Best Diff.");
+        display.println(data.bestDiff.c_str());
+      }
+      if(hasChangedScreen||previous_mining_data.completedShares==NULL||previous_mining_data.completedShares!=data.completedShares){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height*3,122,height,GxEPD_WHITE);
+        display.drawRect(0,height*3,122,height,GxEPD_BLACK);
+        display.setCursor(0, (height*3)+12);
+        display.println("32Bit shar");
+        display.println(data.completedShares.c_str());
+      }
+
+      if(hasChangedScreen||previous_mining_data.temp==NULL||previous_mining_data.temp!=data.temp){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height*4,122,height,GxEPD_WHITE);
+        display.drawRect(0,height*4,122,height,GxEPD_BLACK);
+        display.setCursor(0, (height*4)+12);
+        display.println("Temp.");
+        display.println(data.temp.c_str());
+      }
+
+      if(hasChangedScreen||previous_mining_data.totalMHashes==NULL||previous_mining_data.totalMHashes!=data.totalMHashes){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height*5,122,height,GxEPD_WHITE);
+        display.drawRect(0,height*5,122,height,GxEPD_BLACK);
+        display.setCursor(0, (height*5)+12);
+        display.println("Tot. MH.");
+        display.println(data.totalMHashes.c_str());
+      }
+      
+      if(hasChangedScreen||previous_mining_data.currentHashRate==NULL||previous_mining_data.currentHashRate!=data.currentHashRate){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,height*6,122,height,GxEPD_WHITE);
+        display.drawRect(0,height*6,122,height,GxEPD_BLACK);
+        display.setCursor(0, (height*6)+12);
+        display.println("Cur. HR.");
+        display.print(data.currentHashRate.c_str());
+        display.println(" KH/s");
+      }
+      
+      if(hasChangedScreen||previous_mining_data.timeMining==NULL||previous_mining_data.timeMining!=data.timeMining){
+        display.fillRect(0,250-12-4,122,250,GxEPD_WHITE);
+        display.drawRect(0,250-12-4,122,250,GxEPD_BLACK);
+        display.setCursor(0, 250-4);
+        display.println(data.timeMining.c_str());
+      }
+
+
+      
       
       display.updateWindow(0,0,display.width(), display.height());
       delay(1000);
+      hasChangedScreen = false;
+      previousMillisDisplay = currentMillis;
   }
+  previous_mining_data = data;
 }
+
+clock_data previous_clock_data;
 
 void lilygot5v231display_BTCprice(unsigned long mElapsed)
 {
@@ -126,26 +189,27 @@ void lilygot5v231display_BTCprice(unsigned long mElapsed)
   unsigned long currentMillis = millis();
   if (hasChangedScreen || previousMillisDisplay == 0 || currentMillis - previousMillisDisplay >= (1000*60))
     { // 0.5sec blink
-      hasChangedScreen = false;
-      previousMillisDisplay = currentMillis;
+      
       clock_data data = getClockData(mElapsed);
       
-      Serial.printf(">>> Price: %s\n", data.btcPrice.c_str());
+      //Serial.printf(">>> Price: %s\n", data.btcPrice.c_str());
       
-      //display.eraseDisplay();
-      display.fillScreen(GxEPD_WHITE);
-      //display.eraseDisplay();
-      display.setFont(&FreeMonoBold9pt7b);
-      display.setRotation(0);
-      display.setTextColor(GxEPD_BLACK);
-      display.setCursor(0, 10);
-      display.print("Price ");
-      display.print("\n");
-      display.print(data.btcPrice.c_str());
-      display.print("\n");
-
+      int d = 8;
+      int height = (12*2)+d;
+      if(hasChangedScreen||previous_clock_data.btcPrice==NULL||previous_clock_data.btcPrice!=data.btcPrice){
+        display.setFont(&FreeMonoBold9pt7b);
+        display.fillRect(0,0,122,height,GxEPD_WHITE);
+        display.drawRect(0,0,122,height,GxEPD_BLACK);
+        display.setCursor(0, 12);
+        display.setTextColor(GxEPD_BLACK);
+        display.println("Price");
+        display.println(data.btcPrice.c_str());
+      }
       display.updateWindow(0,0,display.width(), display.height());
       delay(1000);
+      previous_clock_data = data;
+      hasChangedScreen = false;
+      previousMillisDisplay = currentMillis;
     }
   
   

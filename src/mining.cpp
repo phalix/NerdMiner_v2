@@ -299,9 +299,6 @@ void runMiner(void * task_id) {
       //if(!is16BitShare){
         // increment nonce
         nonce += 2;
-        //Serial.println(">>> STARTING TO HASH NONCES ");
-        //Serial.println(nonce,HEX);
-        nonce = random(MAX_NONCE, TARGET_NONCE);
         continue;
       }
 
@@ -315,7 +312,7 @@ void runMiner(void * task_id) {
       // update best diff
       if (diff_hash > best_diff)
         best_diff = diff_hash;
-
+      
       if(diff_hash > mMiner.poolDifficulty)//(hash[29] <= 0x3B)//(diff_hash > 1e-9)
       {
         tx_mining_submit(client, mWorker, mJob, nonce);
@@ -340,9 +337,6 @@ void runMiner(void * task_id) {
       if(hash[29] !=0 || hash[28] !=0) {
         // increment nonce
         nonce += 2;
-        //Serial.println(">>> STARTING TO HASH NONCES ");
-        //Serial.println(nonce,HEX);
-        nonce = random(MAX_NONCE, TARGET_NONCE);
         continue;
       }
       shares++;
@@ -358,9 +352,7 @@ void runMiner(void * task_id) {
       }
       // increment nonce
       nonce += 2;
-      nonce = random(MAX_NONCE,TARGET_NONCE);
-      //Serial.println(">>> STARTING TO HASH NONCES ");
-      //Serial.println(nonce,HEX);
+      
     } // exit if found a valid result or nonce > MAX_NONCE
 
     //wc_Sha256Free(&sha256);

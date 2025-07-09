@@ -99,7 +99,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
       display.setRotation(0);
       //display.fillScreen(GxEPD_WHITE);
       int height = (12*2)+d;
-      if(hasChangedScreen||previous_mining_data.valids==NULL||previous_mining_data.valids!=data.valids){
+      if(hasChangedScreen||previous_mining_data.valids==NULL||strcmp(previous_mining_data.valids.c_str(),data.valids.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,0,122,height,GxEPD_WHITE);
         display.drawRect(0,0,122,height,GxEPD_BLACK);
@@ -109,7 +109,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println(data.valids.c_str());
       }
       
-      if(hasChangedScreen||previous_mining_data.templates==NULL||previous_mining_data.templates!=data.templates){
+      if(hasChangedScreen||previous_mining_data.templates==NULL||strcmp(previous_mining_data.templates.c_str(),data.templates.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height,122,height,GxEPD_WHITE);
         display.drawRect(0,height,122,height,GxEPD_BLACK);
@@ -117,7 +117,8 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println("Blx Templ.");
         display.println(data.templates.c_str());
       }
-      if(hasChangedScreen||previous_mining_data.bestDiff==NULL||previous_mining_data.bestDiff!=data.bestDiff){
+      
+      if(hasChangedScreen||previous_mining_data.bestDiff==NULL||strcmp(previous_mining_data.bestDiff.c_str(),data.bestDiff.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height*2,122,height,GxEPD_WHITE);
         display.drawRect(0,height*2,122,height,GxEPD_BLACK);
@@ -125,7 +126,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println("Best Diff.");
         display.println(data.bestDiff.c_str());
       }
-      if(hasChangedScreen||previous_mining_data.completedShares==NULL||previous_mining_data.completedShares!=data.completedShares){
+      if(hasChangedScreen||previous_mining_data.completedShares==NULL||strcmp(previous_mining_data.completedShares.c_str(),data.completedShares.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height*3,122,height,GxEPD_WHITE);
         display.drawRect(0,height*3,122,height,GxEPD_BLACK);
@@ -133,8 +134,8 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println("32Bit shar");
         display.println(data.completedShares.c_str());
       }
-
-      if(hasChangedScreen||previous_mining_data.temp==NULL||previous_mining_data.temp!=data.temp){
+      
+      if(hasChangedScreen||previous_mining_data.temp==NULL||strcmp(previous_mining_data.temp.c_str(),data.temp.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height*4,122,height,GxEPD_WHITE);
         display.drawRect(0,height*4,122,height,GxEPD_BLACK);
@@ -143,7 +144,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println(data.temp.c_str());
       }
 
-      if(hasChangedScreen||previous_mining_data.totalMHashes==NULL||previous_mining_data.totalMHashes!=data.totalMHashes){
+      if(hasChangedScreen||previous_mining_data.totalMHashes==NULL||strcmp(previous_mining_data.totalMHashes.c_str(),data.totalMHashes.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height*5,122,height,GxEPD_WHITE);
         display.drawRect(0,height*5,122,height,GxEPD_BLACK);
@@ -152,7 +153,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println(data.totalMHashes.c_str());
       }
       
-      if(hasChangedScreen||previous_mining_data.currentHashRate==NULL||previous_mining_data.currentHashRate!=data.currentHashRate){
+      if(hasChangedScreen||previous_mining_data.currentHashRate==NULL||strcmp(previous_mining_data.currentHashRate.c_str(),data.currentHashRate.c_str())!=0){
         display.setFont(&FreeMonoBold9pt7b);
         display.fillRect(0,height*6,122,height,GxEPD_WHITE);
         display.drawRect(0,height*6,122,height,GxEPD_BLACK);
@@ -162,7 +163,7 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
         display.println(" KH/s");
       }
       
-      if(hasChangedScreen||previous_mining_data.timeMining==NULL||previous_mining_data.timeMining!=data.timeMining){
+      if(hasChangedScreen||previous_mining_data.timeMining==NULL||strcmp(previous_mining_data.timeMining.c_str(),data.timeMining.c_str())!=0){
         display.fillRect(0,250-12-4,122,250,GxEPD_WHITE);
         display.drawRect(0,250-12-4,122,250,GxEPD_BLACK);
         display.setCursor(0, 250-4);
@@ -176,8 +177,9 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
       delay(1000);
       hasChangedScreen = false;
       previousMillisDisplay = currentMillis;
+      previous_mining_data = data;
   }
-  previous_mining_data = data;
+  
 }
 
 clock_data previous_clock_data;

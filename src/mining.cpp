@@ -313,6 +313,7 @@ void runMiner(void * task_id) {
       if (diff_hash > best_diff)
         best_diff = diff_hash;
       
+      
       if(diff_hash > mMiner.poolDifficulty)//(hash[29] <= 0x3B)//(diff_hash > 1e-9)
       {
         tx_mining_submit(client, mWorker, mJob, nonce);
@@ -344,7 +345,6 @@ void runMiner(void * task_id) {
       // check if valid header
       if(checkValid(hash, mMiner.bytearray_target)){
         Serial.printf("[WORKER] %d CONGRATULATIONS! Valid block found with nonce: %d | 0x%x\n", miner_id, nonce, nonce);
-        tx_mining_submit(client, mWorker, mJob, nonce);
         valids++;
         Serial.printf("[WORKER]  %d  Submitted work valid!\n", miner_id);
         // wait for new job

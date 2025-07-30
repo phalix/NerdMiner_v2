@@ -25,6 +25,7 @@ typedef struct{
   uint8_t merkle_result[32];
   uint8_t bytearray_blockheader[80];
   uint8_t bytearray_blockheader2[80];
+  uint8_t bytearray_blockheader3[80];
   double poolDifficulty;
   bool inRun;
   bool newJob;

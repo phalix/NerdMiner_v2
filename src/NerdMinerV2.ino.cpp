@@ -123,7 +123,7 @@ void setup()
   Serial.println("Initiating tasks...");
   char *name = (char*) malloc(32);
   sprintf(name, "(%s)", "Monitor");
-  BaseType_t res1 = xTaskCreatePinnedToCore(runMonitor, "Monitor", 10000, (void*)name, 4, NULL,1);
+  BaseType_t res1 = xTaskCreatePinnedToCore(runMonitor, "Monitor", 10000, (void*)name, 99, NULL,1);
 
   /******** CREATE STRATUM TASK *****/
   sprintf(name, "(%s)", "Stratum");
@@ -141,12 +141,18 @@ void setup()
 
   // Start mining tasks
   //BaseType_t res = xTaskCreate(runWorker, name, 35000, (void*)name, 1, NULL);
+  
   TaskHandle_t minerTask1, minerTask2 = NULL;
-  xTaskCreate(runMiner, "Miner0", 6000, (void*)0, 1, &minerTask1);
-  xTaskCreate(runMiner, "Miner1", 6000, (void*)1, 1, &minerTask2);
+  //xTaskCreate(runMiner, "Miner0", 6000, (void*)0, 1, &minerTask1);
+  //xTaskCreate(runMiner, "Miner1", 6000, (void*)1, 1, &minerTask2);
+  xTaskCreatePinnedToCore(runMiner, "Miner0", 6000, (void*)0, 1, &minerTask1, 1);
+  xTaskCreatePinnedToCore(runMiner, "Miner1", 6000, (void*)1, 1, &minerTask2, 0);
+  
  
   esp_task_wdt_add(minerTask1);
   esp_task_wdt_add(minerTask2);
+  
+  
 
   /******** MONITOR SETUP *****/
   setup_monitor();

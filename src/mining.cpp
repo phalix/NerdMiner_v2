@@ -6,6 +6,7 @@
 #include <nvs.h>
 //#include "ShaTests/nerdSHA256.h"
 #include "ShaTests/nerdSHA256plus.h"
+#include "ShaTests/nerdSHA256HW.h"
 #include "stratum.h"
 #include "mining.h"
 #include "utils.h"
@@ -246,6 +247,7 @@ void runMiner(void * task_id) {
     nerdSHA256_context nerdMidstate; //NerdShaplus
     uint8_t hash[32];
     
+    
 
     //Calcular midstate
     nerd_mids(&nerdMidstate, mMiner.bytearray_blockheader); //NerdShaplus
@@ -268,7 +270,7 @@ void runMiner(void * task_id) {
       header64 = mMiner.bytearray_blockheader + 64;
     else
       header64 = mMiner.bytearray_blockheader2 + 64;
-    
+
     bool is16BitShare=true;  
     Serial.println(">>> STARTING TO HASH NONCES");
     while(true) {
@@ -276,11 +278,15 @@ void runMiner(void * task_id) {
         memcpy(mMiner.bytearray_blockheader + 76, &nonce, 4);
       else
         memcpy(mMiner.bytearray_blockheader2 + 76, &nonce, 4);
-
-
-      //nerd_double_sha2(&nerdMidstate, header64, hash);
-      is16BitShare=nerd_sha256d(&nerdMidstate, header64, hash); //Boosted 80Khs sha
-
+      
+      if (miner_id == 0){
+          nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader,hash);
+        }else {
+          //nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader2,hash);
+          is16BitShare=nerd_sha256d(&nerdMidstate, header64, hash);
+        }
+      //is16BitShare=nerd_sha256d(&nerdMidstate, header64, hash); //Boosted 80Khs sha
+      
       /*Serial.print("hash1: ");
       for (size_t i = 0; i < 32; i++)
             Serial.printf("%02x", hash[i]);
@@ -298,7 +304,7 @@ void runMiner(void * task_id) {
       if(hash[31] !=0 || hash[30] !=0) {
       //if(!is16BitShare){
         // increment nonce
-        nonce += 2;
+        nonce += 20;
         continue;
       }
 
@@ -322,13 +328,33 @@ void runMiner(void * task_id) {
         Serial.print("   - TX SHARE: ");
         for (size_t i = 0; i < 32; i++)
             Serial.printf("%02x", hash[i]);
+        Serial.println();
+        /*
+        uint8_t hash2[32];
+        if (miner_id == 0){
+          nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader,hash2);
+        }else{
+            nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader2,hash2);
+        }
+        
+        Serial.print("   - TXHW SHARE: ");
+        for (size_t i = 0; i < 32; i++)
+            Serial.printf("%02x", hash2[i]);
+        */
         #ifdef DEBUG_MINING
         Serial.println("");
         Serial.print("   - Current nonce: "); Serial.println(nonce);
         Serial.print("   - Current block header: ");
         for (size_t i = 0; i < 80; i++) {
+          if (miner_id == 0){
             Serial.printf("%02x", mMiner.bytearray_blockheader[i]);
+          }else{
+            Serial.printf("%02x", mMiner.bytearray_blockheader2[i]);
+          }
         }
+        Serial.println();
+        
+
         #endif
         Serial.println("");
         mLastTXtoPool = millis();  
@@ -337,7 +363,7 @@ void runMiner(void * task_id) {
       // check if 32bit share
       if(hash[29] !=0 || hash[28] !=0) {
         // increment nonce
-        nonce += 2;
+        nonce += 20;
         continue;
       }
       shares++;
@@ -351,7 +377,7 @@ void runMiner(void * task_id) {
         break;
       }
       // increment nonce
-      nonce += 2;
+      nonce += 20;
       
     } // exit if found a valid result or nonce > MAX_NONCE
 

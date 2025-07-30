@@ -304,7 +304,7 @@ void runMiner(void * task_id) {
       if(hash[31] !=0 || hash[30] !=0) {
       //if(!is16BitShare){
         // increment nonce
-        nonce += 20;
+        nonce += 2;
         continue;
       }
 
@@ -363,7 +363,7 @@ void runMiner(void * task_id) {
       // check if 32bit share
       if(hash[29] !=0 || hash[28] !=0) {
         // increment nonce
-        nonce += 20;
+        nonce += 2;
         continue;
       }
       shares++;
@@ -377,7 +377,7 @@ void runMiner(void * task_id) {
         break;
       }
       // increment nonce
-      nonce += 20;
+      nonce += 2;
       
     } // exit if found a valid result or nonce > MAX_NONCE
 

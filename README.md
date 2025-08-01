@@ -1,4 +1,8 @@
-# NerdSoloMiner
+# NerdSoloMiner (SHA Hardware Enabled)
+
+## SHA Hardware Enabled on ESP32
+
+This is a Fork of the NerdSoloMiner. The difference is that on Core 1 the Mining Process does not use Software for Hashing, but the integrated SHA256 Hardware Acceleration for Hashing.  
 
 **The NerdSoloMiner v2**
 

@@ -219,6 +219,39 @@ void runStratumWorker(void *name) {
 
 //This works only with one thread, TODO -> Class or miner_data for each thread
 
+void runTestOfPerformance(void * task_id){
+  unsigned long mLastCheck =  millis();
+  uint8_t hash[32];
+  
+  int counter = 0;
+  while(1){
+    counter += 1;
+    uint8_t bytearray[80] = {
+  12, 45, 78, 33, 90, 254, 1, 67, 89, 23,
+  56, 199, 34, 87, 123, 210, 8, 144, 76, 59,
+  22, 88, 13, 5, 250, 99, 18, 61, 172, 33,
+  211, 45, 66, 77, 198, 3, 111, 43, 56, 78,
+  93, 149, 120, 11, 67, 204, 188, 1, 9, 56,
+  72, 66, 134, 200, 18, 17, 93, 47, 11, 85,
+  123, 211, 34, 77, 98, 250, 176, 88, 19, 42,
+  76, 81, 59, 144, 6, 33, 221, 18, 90, 13
+};
+    nerd_double_sha2_hwcrypt(bytearray,hash);
+    unsigned long mElapsed = millis() - mLastCheck;
+    //mLastCheck = millis();
+    
+    if((counter % 5000) == 0){
+      if(mElapsed>1000){
+        unsigned long currentKHashes = (counter / 1000) / (mElapsed / 1000);
+        Serial.printf(">>> avg. hashrate %lu KH/s\n", currentKHashes);
+      }
+      
+    }
+  }
+  
+
+}
+
   
 void runMiner(void * task_id) {
 
@@ -329,6 +362,11 @@ void runMiner(void * task_id) {
         for (size_t i = 0; i < 32; i++)
             Serial.printf("%02x", hash[i]);
         Serial.println();
+        if(miner_id==0){
+          Serial.println("   Found by Hardware SHA");
+        }else{
+          Serial.println("   Found by Software SHA");
+        }
         /*
         uint8_t hash2[32];
         if (miner_id == 0){

@@ -52,6 +52,29 @@ const char* ntpServer = "pool.ntp.org";
 //void runMonitor(void *name);
 
 /********* INIT *****/
+void setup3(){
+  #ifdef PIN_ENABLE5V
+      pinMode(PIN_ENABLE5V, OUTPUT);
+      digitalWrite(PIN_ENABLE5V, HIGH);
+  #endif
+
+#ifdef MONITOR_SPEED
+    Serial.begin(MONITOR_SPEED);
+#else
+    Serial.begin(115200);
+#endif //MONITOR_SPEED
+TaskHandle_t minerTask1 = NULL;
+  
+  xTaskCreatePinnedToCore(runTestOfPerformance, "Miner0", 6000, (void*)0, 1, &minerTask1, 1);
+  
+  esp_task_wdt_add(minerTask1);
+  
+}
+
+void loop3(){
+  
+}
+
 void setup()
 {
       //Init pin 15 to eneble 5V external power (LilyGo bug)
@@ -65,6 +88,9 @@ void setup()
 #else
     Serial.begin(115200);
 #endif //MONITOR_SPEED
+
+
+
 
   Serial.setTimeout(0);
   delay(SECOND_MS/10);
@@ -145,6 +171,7 @@ void setup()
   TaskHandle_t minerTask1, minerTask2 = NULL;
   //xTaskCreate(runMiner, "Miner0", 6000, (void*)0, 1, &minerTask1);
   //xTaskCreate(runMiner, "Miner1", 6000, (void*)1, 1, &minerTask2);
+
   xTaskCreatePinnedToCore(runMiner, "Miner0", 6000, (void*)0, 1, &minerTask1, 1);
   xTaskCreatePinnedToCore(runMiner, "Miner1", 6000, (void*)1, 1, &minerTask2, 0);
   

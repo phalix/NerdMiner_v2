@@ -91,19 +91,14 @@ void esp_sha_block1(esp_sha_type sha_type, const void *data_block, bool first_bl
     #endif
 
         // preemptively do this before entering the critical section, then re-check once in it
-        sha_hal_wait_idle();
-        //esp_sha_lock_memory_block();
-
-        //sha_hal_hash_block(sha_type, data_block, 64 / 4, first_block);
+        //sha_hal_wait_idle();
+        
         sha_ll_fill_text_block(data_block, 64 / 4);
         if (first_block) {
             sha_ll_start_block(sha_type);
         } else {
             sha_ll_continue_block(sha_type);
         }
-
-        //esp_sha_unlock_memory_block();
-
 }
 
 
@@ -116,20 +111,10 @@ int mbedtls_internal_sha256_process1( mbedtls_sha256_context *ctx, const unsigne
     if (ctx->mode == ESP_MBEDTLS_SHA256_UNUSED) {
         ctx->mode = ESP_MBEDTLS_SHA256_HARDWARE;
         first_block = true;
-        /*if (!ctx->is224 && esp_sha_try_lock_engine1(SHA2_256)) {
-            ctx->mode = ESP_MBEDTLS_SHA256_HARDWARE;
-            first_block = true;
-        } else {
-            ctx->mode = ESP_MBEDTLS_SHA256_SOFTWARE;
-        }*/
+        
     }
     esp_sha_block1(SHA2_256, data, first_block);
-    /*if (ctx->mode == ESP_MBEDTLS_SHA256_HARDWARE) {
-        esp_sha_block1(SHA2_256, data, first_block);
-    } else {
-        //mbedtls_sha256_software_process(ctx, data);
-        return -1;
-    }*/
+    
 
     return 0;
 
@@ -257,15 +242,12 @@ void esp_sha_read_digest_state1(esp_sha_type sha_type, void *digest_state)
     // preemptively do this before entering the critical section, then re-check once in it
     sha_hal_wait_idle();
 
-    //esp_sha_lock_memory_block();
-
-    //sha_hal_read_digest(sha_type, digest_state); //replaced implementation with this!
     uint32_t *digest_state_words = (uint32_t *)digest_state;
 
     sha_ll_load(sha_type);
     uint32_t word_len = (256 / 32);
 
-    sha_hal_wait_idle();
+    //sha_hal_wait_idle();
     sha_ll_read_digest(sha_type, digest_state, word_len);
 
     /* Fault injection check: verify SHA engine actually ran,
@@ -380,7 +362,6 @@ IRAM_ATTR int nerd_double_sha2_hwcrypt(uint8_t* dataIn, uint8_t* doubleHash)
    
    //esp_sha_lock_memory_block();
    
-
   ctx.mode = ESP_MBEDTLS_SHA256_UNUSED;
   mbedtls_sha256_starts_ret1(&ctx, 0);
   

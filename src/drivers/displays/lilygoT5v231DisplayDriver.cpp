@@ -71,7 +71,8 @@ mining_data previous_mining_data;
 void lilygot5v231display_MinerScreen(unsigned long mElapsed)
 {
   mining_data data = getMiningData(mElapsed);
-
+  Serial.printf(">>> Completed %s share(s), %s Khashes, avg. hashrate %s KH/s\n",
+                data.completedShares.c_str(), data.totalKHashes.c_str(), data.currentHashRate.c_str());
   /*
   // Print hashrate to serial
   Serial.printf(">>> Completed %s share(s), %s Khashes, avg. hashrate %s KH/s\n",
@@ -94,6 +95,8 @@ void lilygot5v231display_MinerScreen(unsigned long mElapsed)
       //digitalWrite(LED_PIN, !digitalRead(LED_PIN)); // Cambia el estado del LED
       //cleanDisplay();
       
+      
+
       int d = 8;
       
       display.setRotation(0);

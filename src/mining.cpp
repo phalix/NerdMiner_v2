@@ -236,7 +236,7 @@ void runTestOfPerformance(void * task_id){
   123, 211, 34, 77, 98, 250, 176, 88, 19, 42,
   76, 81, 59, 144, 6, 33, 221, 18, 90, 13
 };
-    nerd_double_sha2_hwcrypt(bytearray,hash);
+    nerd_double_sha2_hw(bytearray,hash);
     unsigned long mElapsed = millis() - mLastCheck;
     //mLastCheck = millis();
     
@@ -256,7 +256,7 @@ void runTestOfPerformance(void * task_id){
 void runMiner(void * task_id) {
 
   unsigned int miner_id = (uint32_t)task_id;
-
+  int ret;
   Serial.printf("[MINER]  %d  Started runMiner Task!\n", miner_id);
 
   while(1){
@@ -313,7 +313,12 @@ void runMiner(void * task_id) {
         memcpy(mMiner.bytearray_blockheader2 + 76, &nonce, 4);
       
       if (miner_id == 0){
-          nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader,hash);
+          ret = nerd_double_sha2_hw(mMiner.bytearray_blockheader,hash);
+          if(ret != 0){
+            Serial.println(">>> Issue with SHA Hardware. Repeat.");
+            continue;
+          }
+
         }else {
           //nerd_double_sha2_hwcrypt(mMiner.bytearray_blockheader2,hash);
           is16BitShare=nerd_sha256d(&nerdMidstate, header64, hash);

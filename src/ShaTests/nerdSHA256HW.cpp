@@ -35,12 +35,6 @@ bool esp_sha_try_lock_engine1(esp_sha_type sha_type)
 }
 
 
-IRAM_ATTR int nerd_midstate_hwcrypt(uint8_t* data, uint32_t len)
-{
-    return 0;
-}
-
-
 void print_hash(const uint8_t *hash, size_t len) {
     for (size_t i = 0; i < len; i++) {
         Serial.printf("%02x", hash[i]);
@@ -229,7 +223,7 @@ do {                                                    \
 #endif
 
 
-void esp_sha_read_digest_state1(esp_sha_type sha_type, void *digest_state)
+int esp_sha_read_digest_state1(esp_sha_type sha_type, void *digest_state)
 {
 #ifndef NDEBUG
     {
@@ -256,12 +250,12 @@ void esp_sha_read_digest_state1(esp_sha_type sha_type, void *digest_state)
     
     for (size_t i = 0; i < word_len; i++) {
         if (digest_state_words[i] != 0) {
-            return;
+            return 0;
         }
     }
     Serial.println(counter);
-    abort(); // SHA peripheral returned all zero state, probably due to fault injection
-
+    //abort(); // SHA peripheral returned all zero state, probably due to fault injection
+    return -1;
 
     //esp_sha_unlock_memory_block();
 }
@@ -294,7 +288,9 @@ int mbedtls_sha256_finish_ret1( mbedtls_sha256_context *ctx, unsigned char outpu
 
     /* if state is in hardware, read it out */
     if (ctx->mode == ESP_MBEDTLS_SHA256_HARDWARE) {
-        esp_sha_read_digest_state1(SHA2_256, ctx->state);
+        if(esp_sha_read_digest_state1(SHA2_256, ctx->state) !=0){
+            return -1;
+        }
     }
 
     PUT_UINT32_BE( ctx->state[0], output,  0 );
@@ -340,7 +336,7 @@ void mbedtls_sha256_init1( mbedtls_sha256_context *ctx )
 
 mbedtls_sha256_context ctx;
 
-IRAM_ATTR int nerd_double_sha2_hwcrypt(uint8_t* dataIn, uint8_t* doubleHash)
+IRAM_ATTR int nerd_double_sha2_hw(uint8_t* dataIn, uint8_t* doubleHash)
 {
 
   unsigned char *payload = dataIn;
@@ -370,8 +366,10 @@ IRAM_ATTR int nerd_double_sha2_hwcrypt(uint8_t* dataIn, uint8_t* doubleHash)
   assert(ret == 0);
   
   ret = mbedtls_sha256_finish_ret1(&ctx, first_hash);
-  assert(ret == 0);
-  
+  if(ret != 0){
+    return -1;
+  }
+
   mbedtls_sha256_starts_ret1(&ctx, 0);
   ctx.mode = ESP_MBEDTLS_SHA256_UNUSED;
 
@@ -379,7 +377,9 @@ IRAM_ATTR int nerd_double_sha2_hwcrypt(uint8_t* dataIn, uint8_t* doubleHash)
   assert(ret == 0);
 
   ret = mbedtls_sha256_finish_ret1(&ctx, doubleHash);
-  assert(ret == 0);
+  if(ret != 0){
+    return -1;
+  }
   
   mbedtls_sha256_free1(&ctx);
   
